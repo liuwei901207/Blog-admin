@@ -3,13 +3,13 @@
 module.exports = appInfo => {
   const config = exports = {}
 
-  // use for cookie sign key, should change to your own and keep security
+  // cookie appKey 设置
   config.keys = appInfo.name + '_1534143697660_2333'
 
-  // add your config here
+  // 全局中间件加载
   config.middleware = []
 
-  // mysql
+  // mysql 配置选项
   config.sequelize = {
     dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
     database: 'my-blog',
