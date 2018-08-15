@@ -1,12 +1,12 @@
 'use strict'
 
-// mysql连接插件
+// mysql 连接插件
 exports.sequelize = {
   enable: true,
   package: 'egg-sequelize',
 }
 
-// graphql连接插件
+// graphql 连接插件
 exports.graphql = {
   enable: true,
   package: 'egg-graphql',
@@ -16,4 +16,16 @@ exports.graphql = {
 exports.cors = {
   enable: true,
   package: 'egg-cors',
+}
+
+// redis 连接插件
+exports.redis = {
+  enable: true,
+  package: 'egg-redis',
+}
+
+// sessionRedis 连接插件
+exports.sessionRedis = {
+  enable: true,
+  package: 'egg-session-redis',
 }

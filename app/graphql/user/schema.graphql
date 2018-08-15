@@ -1,6 +1,6 @@
 type User {
     id: ID!
-    account: String!
+    username: String!
     name: String
     email: String
     cell_phone: String!

@@ -8,7 +8,7 @@ module.exports = app => {
   const {STRING, DATE} = app.Sequelize
 
   const User = app.model.define('user', {
-    account: {
+    username: {
       type: STRING,
       unique: true,
       allowNull: false,

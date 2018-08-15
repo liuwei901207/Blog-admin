@@ -8,8 +8,10 @@
     "egg": "^2.2.1",
     "egg-cors": "^2.1.0",
     "egg-graphql": "^2.1.0",
+    "egg-redis": "^2.0.0",
     "egg-scripts": "^2.5.0",
     "egg-sequelize": "^3.1.5",
+    "egg-session-redis": "^2.0.0",
     "jsonwebtoken": "^8.3.0",
     "moment": "^2.22.2",
     "mysql2": "^1.6.1"

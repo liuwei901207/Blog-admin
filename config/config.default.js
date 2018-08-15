@@ -3,8 +3,32 @@
 module.exports = appInfo => {
   const config = exports = {}
 
+  // 日志 配置选项
+  config.logger = {
+    level: 'INFO',
+    allowDebugAtProd: false,
+  }
+
   // cookie appKey 配置选项
-  config.keys = appInfo.name + '_1534143697660_2333'
+  config.keys = 'ryx4YwRg5omCs7Yb'
+
+  // session 配置选项
+  config.session = {
+    key: 'EGG_SESS',
+    maxAge: 2 * 3600 * 1000, // 2 小时
+    httpOnly: true,
+    encrypt: true,
+  }
+
+  // redis 配置选项
+  config.redis = {
+    client: {
+      port: 6379,          // Redis port
+      host: '127.0.0.1',   // Redis host
+      password: 'auth',
+      db: 0,
+    },
+  }
 
   // cors 配置选项
   config.cors = {
@@ -24,7 +48,7 @@ module.exports = appInfo => {
     dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
     database: 'my-blog',
     host: 'localhost',
-    port: '43306',
+    port: '3306',
     username: 'root',
     password: '123456',
   }
@@ -38,10 +62,6 @@ module.exports = appInfo => {
     agent: false,
     // 是否加载开发者工具 graphiql, 默认开启。路由同 router 字段。使用浏览器打开该可见。
     graphiql: true,
-    // graphQL 路由前的拦截器
-    onPreGraphQL: function * (ctx) {},
-    // 开发工具 graphiQL 路由前的拦截器，建议用于做权限操作(如只提供开发者使用)
-    onPreGraphiQL: function * (ctx) {},
   }
 
   // jsonLimit 配置选项
@@ -51,7 +71,13 @@ module.exports = appInfo => {
   }
 
   // 全局中间件加载
-  config.middleware = ['graphqlAuth', 'graphql']
+  config.middleware = ['graphqlAccess', 'graphql']
+
+  config.onerror = {
+    all: (err, ctx) => {
+      console.log(err)
+    },
+  }
 
   return config
 }

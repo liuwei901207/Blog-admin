@@ -1,7 +1,5 @@
 'use strict'
 
-// app/service/users.js
-
 const Service = require('egg').Service
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
@@ -63,7 +61,7 @@ class UserService extends Service {
               },
           },
           {
-            account:
+            username:
               {
                 $eq: userID_or_userAccount,
               },
@@ -122,7 +120,7 @@ class UserService extends Service {
    * @param {string} password - 密码
    * @return {Promise<*>} - 返回promise
    */
-  async findUserByAccountAndPassword ({username, password, rememberMe}) {
+  async userLogin ({username, password, rememberMe}) {
     const ctx = this.ctx
     const md5 = crypto.createHash('md5')
     password = md5.update(password).digest('hex')
@@ -133,17 +131,33 @@ class UserService extends Service {
         password,
       },
     })
-    if (!user) {
-      ctx.throw(404, 'user login failed')
+
+    const IP = ctx.ip
+    const ipip = await ctx.app.curl(`http://freeapi.ipip.net/${IP}`, {
+      dataType: 'json',
+    })
+    let loginRecord = {
+      IP,
+      country: ipip.data[0],
+      province: ipip.data[1],
+      city: ipip.data[2],
+      equipment: '',
+      status: '',
+      username,
     }
 
-    await user.update({last_sign_in_at: new Date()}) // 添加登录时间
+    if (!user) {
+      loginRecord.status = '登陆失败, 用户名或密码错误!'
+      ctx.throw(401, {message: '登陆失败, 用户名或密码错误!'})
+    }
 
-    // todo 如果用户勾选了 `记住我`，设置 30 天的过期时间
-    user.token = jwt.sign({uid: user.id}, 'secret', {
-      expiresIn: 60 * 60,
+    loginRecord.status = '登陆成功!'
+    user.token = jwt.sign({uid: user.id, IP}, ctx.app.config.keys, {
+      expiresIn: rememberMe ? '7d' : '2h',
     })
-
+    user.update({last_sign_in_at: new Date()}) // 添加登录时间
+    ctx.model.UserLoginRecord.create(loginRecord) // 保存用户登录记录
+    await ctx.app.redis.set(user.id, user.token, 'PX', rememberMe ? 30 * 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000) // 默认为2 小时， 记住我为7 天
     return user
   }
 

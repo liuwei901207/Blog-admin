@@ -10,7 +10,7 @@ module.exports = options => {
       return
     }
     const body = ctx.request.body
-    if (body.operationName !== 'UserLogin') {
+    if (body.operationName !== 'login') {
       let token = ctx.request.header['authorization']
       if (token === undefined) {
         ctx.body = {message: '令牌为空，请登陆获取！'}
@@ -19,9 +19,8 @@ module.exports = options => {
       }
       token = token.replace(/^Bearer\s/, '')
       try {
-        let decoded = jwt.verify(token, 'secret', {
-          expiresIn: 60 * 60,
-        })
+        let decoded = jwt.verify(token, ctx.app.config.keys)
+        console.log(decoded)
         await next()
       } catch (err) {
         ctx.body = {message: '访问令牌鉴权无效，请重新登陆获取！'}
