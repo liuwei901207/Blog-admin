@@ -131,7 +131,6 @@ class UserService extends Service {
         password,
       },
     })
-
     const IP = ctx.ip
     const ipip = await ctx.app.curl(`http://freeapi.ipip.net/${IP}`, {
       dataType: 'json',
@@ -145,8 +144,8 @@ class UserService extends Service {
       status: '',
       username,
     }
-
     if (!user) {
+      user.success = false
       loginRecord.status = '登陆失败, 用户名或密码错误!'
       ctx.throw(401, {message: '登陆失败, 用户名或密码错误!'})
     }

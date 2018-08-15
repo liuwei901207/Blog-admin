@@ -1,7 +1,5 @@
 'use strict'
 
-const DataLoader = require('dataloader')
-
 class UserConnector {
   constructor (ctx) {
     this.ctx = ctx

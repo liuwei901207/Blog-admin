@@ -1,3 +1,4 @@
-type Token {
+type TokenRes {
+    id:ID!
     token: String
 }
