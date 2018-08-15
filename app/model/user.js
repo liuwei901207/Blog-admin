@@ -1,7 +1,5 @@
 'use strict'
 
-// app/model/user.js
-
 const crypto = require('crypto')
 
 module.exports = app => {
