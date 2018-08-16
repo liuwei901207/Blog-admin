@@ -3,37 +3,45 @@
 module.exports = app => {
   const {STRING, DATE} = app.Sequelize
 
-  const UserLoginRecord = app.model.define('user_login_record', {
-    IP: {
+  const BlogConfig = app.model.define('blog_config', {
+    // 博客名称
+    name: {
+      type: STRING,
+      unique: false,
+      allowNull: false,
+    },
+    // 博客头像
+    avatar: {
+      type: STRING,
+      unique: false,
+      allowNull: false,
+    },
+    // 个性签名
+    sign: {
+      type: STRING,
+      unique: false,
+      allowNull: false,
+    },
+    // 微信支付二维码
+    wxpay_qrcode: {
       type: STRING,
       unique: false,
       allowNull: true,
     },
-    country: {
+    // 支付宝支付二维码
+    alipay_qrcode: {
       type: STRING,
       unique: false,
       allowNull: true,
     },
-    province: {
+    // github
+    github: {
       type: STRING,
       unique: false,
       allowNull: true,
     },
-    city: {
-      type: STRING,
-      unique: false,
-      allowNull: true,
-    },
-    equipment: {
-      type: STRING,
-      allowNull: true,
-    },
-    username: {
-      type: STRING,
-      unique: false,
-      allowNull: true,
-    },
-    status: {
+    // 网站备案号
+    ICP: {
       type: STRING,
       unique: false,
       allowNull: true,
@@ -42,5 +50,5 @@ module.exports = app => {
     updated_at: DATE,
   })
 
-  return UserLoginRecord
+  return BlogConfig
 }

@@ -25,7 +25,7 @@ module.exports = appInfo => {
     client: {
       port: 6379,          // Redis port
       host: '127.0.0.1',   // Redis host
-      password: 'auth',
+      password: 'homestead',
       db: 0,
     },
   }
@@ -48,7 +48,7 @@ module.exports = appInfo => {
     dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
     database: 'my-blog',
     host: 'localhost',
-    port: '3306',
+    port: '43306',
     username: 'root',
     password: '123456',
   }

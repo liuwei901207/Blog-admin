@@ -123,6 +123,8 @@ class UserService extends Service {
   async userLogin ({username, password, rememberMe}) {
     const ctx = this.ctx
     const md5 = crypto.createHash('md5')
+    const IP = ctx.ip
+    let loginRecord = {status: 'info', IP, content: ''}
     password = md5.update(password).digest('hex')
     const user = await this.ctx.model.User.findOne({
       attributes: {exclude: ['password']}, // 不包含密码字段
@@ -131,31 +133,20 @@ class UserService extends Service {
         password,
       },
     })
-    const IP = ctx.ip
-    const ipip = await ctx.app.curl(`http://freeapi.ipip.net/${IP}`, {
-      dataType: 'json',
-    })
-    let loginRecord = {
-      IP,
-      country: ipip.data[0],
-      province: ipip.data[1],
-      city: ipip.data[2],
-      equipment: '',
-      status: '',
-      username,
-    }
     if (!user) {
       user.success = false
-      loginRecord.status = '登陆失败, 用户名或密码错误!'
+      loginRecord.status = 'error'
+      loginRecord.content = `用户账号:${username} 尝试登录管理后台失败`
       ctx.throw(401, {message: '登陆失败, 用户名或密码错误!'})
     }
 
-    loginRecord.status = '登陆成功!'
+    loginRecord.status = 'info'
+    loginRecord.content = `用户账号:${username} 登录成功`
     user.token = jwt.sign({uid: user.id, IP}, ctx.app.config.keys, {
       expiresIn: rememberMe ? '7d' : '2h',
     })
     user.update({last_sign_in_at: new Date()}) // 添加登录时间
-    ctx.model.UserLoginRecord.create(loginRecord) // 保存用户登录记录
+    ctx.model.BlogSysLog.create(loginRecord) // 保存用户登录记录
     await ctx.app.redis.set(user.id, user.token, 'PX', rememberMe ? 30 * 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000) // 默认为2 小时， 记住我为7 天
     return user
   }
