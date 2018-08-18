@@ -1,4 +1,4 @@
 type TokenRes {
-    id:ID!
     token: String
+    user: User
 }

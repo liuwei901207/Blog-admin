@@ -124,7 +124,7 @@ class UserService extends Service {
     const ctx = this.ctx
     const md5 = crypto.createHash('md5')
     const IP = ctx.ip
-    let loginRecord = {status: 'info', IP, content: ''}
+    let BlogSysLog = {status: 'info', IP, content: ''}
     password = md5.update(password).digest('hex')
     const user = await this.ctx.model.User.findOne({
       attributes: {exclude: ['password']}, // 不包含密码字段
@@ -134,40 +134,34 @@ class UserService extends Service {
       },
     })
     if (!user) {
-      user.success = false
-      loginRecord.status = 'error'
-      loginRecord.content = `用户账号:${username} 尝试登录管理后台失败`
-      ctx.throw(401, {message: '登陆失败, 用户名或密码错误!'})
+      BlogSysLog.status = 'error'
+      BlogSysLog.content = `用户账号:${username} 尝试登录管理后台失败`
+      return ctx.throw(401, {message: '登陆失败, 用户名或密码错误!'})
     }
 
-    loginRecord.status = 'info'
-    loginRecord.content = `用户账号:${username} 登录成功`
-    user.token = jwt.sign({uid: user.id, IP}, ctx.app.config.keys, {
+    BlogSysLog.status = 'info'
+    BlogSysLog.content = `用户账号:${username} 登录成功`
+    const token = jwt.sign({uid: user.id}, ctx.app.config.keys, {
       expiresIn: rememberMe ? '7d' : '2h',
     })
     user.update({last_sign_in_at: new Date()}) // 添加登录时间
-    ctx.model.BlogSysLog.create(loginRecord) // 保存用户登录记录
-    await ctx.app.redis.set(user.id, user.token, 'PX', rememberMe ? 30 * 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000) // 默认为2 小时， 记住我为7 天
-    return user
+    ctx.model.BlogSysLog.create(BlogSysLog) // 保存用户登录记录
+    await ctx.app.redis.set(user.id, user.token, 'PX', rememberMe ? 7 * 24 * 60 * 60 * 1000 : 2 * 60 * 60 * 1000) // 默认为2 小时， 记住我为7 天
+    return {user, token}
   }
 
   /**
    * 用户登出
-   * @return {Promise<boolean>} - 返回登出状态
+   * @returns {Promise<{user: null, token: null}>}
    */
   async userLogout () {
     const ctx = this.ctx
-    const user = ctx.session.user
-    if (user) {
-      ctx.session.user = null
-      ctx.locals.user = null
-      ctx.locals.serverMessage = {
-        type: 'alert-info',
-        content: '您已经登出系统',
-      }
-      return true
-    }
-    return false
+    const IP = ctx.ip
+    const tokenUid = ctx.session.tokenUid
+    await ctx.app.redis.del(tokenUid)
+    const BlogSysLog = {status: 'info', IP, content: `登出系统成功, userId: ${tokenUid} 已注销`}
+    ctx.model.BlogSysLog.create(BlogSysLog) // 保存用户登出记录
+    return {user: null, token: null}
   }
 
   async changePass ({password, new_password, re_password}) {

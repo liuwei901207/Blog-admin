@@ -9,7 +9,7 @@ module.exports = appInfo => {
     allowDebugAtProd: false,
   }
 
-  // cookie appKey 配置选项
+  // cookie && token appKey 配置选项
   config.keys = 'ryx4YwRg5omCs7Yb'
 
   // session 配置选项
@@ -61,7 +61,7 @@ module.exports = appInfo => {
     // 是否加载到 agent 上，默认关闭
     agent: false,
     // 是否加载开发者工具 graphiql, 默认开启。路由同 router 字段。使用浏览器打开该可见。
-    graphiql: true,
+    graphiql: false,
   }
 
   // jsonLimit 配置选项
@@ -73,10 +73,8 @@ module.exports = appInfo => {
   // 全局中间件加载
   config.middleware = ['graphqlAccess', 'graphql']
 
-  config.onerror = {
-    all: (err, ctx) => {
-      console.log(err)
-    },
+  config.graphqlAccess = {
+    match: '/graphql',
   }
 
   return config
